@@ -1,47 +1,89 @@
 import 'package:flutdex/DataModels/pokemon_model.dart';
 import 'package:flutdex/Network/poke_api_service.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final homeScreenViewController =
-    ChangeNotifierProvider((ref) => HomeScreenViewController(ref.read));
+    StateNotifierProvider<HomeScreenViewNotifier, HomeScreenViewState>((ref) {
+  return HomeScreenViewNotifier(ref.read(pokeApiRepository));
+});
 
-class HomeScreenViewController extends ChangeNotifier {
-  final Reader read;
-  HomeScreenViewController(this.read);
-
-  List<Pokemon> _pokemons = [];
-  List<Pokemon> get pokemons => _pokemons;
-
-  bool _isLoadMoreLoading = false;
-  bool get isLoadMoreLoading => _isLoadMoreLoading;
-
-  late PokeApiRepository _pokeRepository;
+class HomeScreenViewNotifier extends StateNotifier<HomeScreenViewState> {
+  final PokeApiRepository pokeApiRepository;
+  HomeScreenViewNotifier(this.pokeApiRepository)
+      : super(HomeScreenViewState(isLoadMoreLoading: false, pokemons: [])) {
+    _loadPokemonsFromApi();
+  }
 
   int _offset = 1;
   int _limit = 10;
 
-  void initState() async {
-    _pokeRepository = read(pokeApiRepository);
-    await Future.delayed(Duration(seconds: 1));
-
-    await _loadPokemonsFromApi();
-  }
-
   loadMorePokemons() async {
     _offset += _limit;
     await _loadPokemonsFromApi();
-    notifyListeners();
   }
 
   _loadPokemonsFromApi() async {
-    _isLoadMoreLoading = true;
-    notifyListeners();
-    List<Pokemon> _pokemonBuffer = await _pokeRepository.getPokemonsList(
+    
+    state = state.copyWith(pokemons: state.pokemons, isLoadMoreLoading: true);
+   
+    List<Pokemon> _pokemonBuffer = await pokeApiRepository.getPokemonsList(
         offset: _offset, limit: _offset + _limit);
-    _pokemons += _pokemonBuffer;
+    
+    state = state.copyWith(
+        pokemons: state.pokemons + _pokemonBuffer, isLoadMoreLoading: false);
+    
+  }
+}
 
-    _isLoadMoreLoading = false;
-    notifyListeners();
+// class HomeScreenViewController {
+//   // final PokeApiRepository _pokeApiRepository;
+//   HomeScreenViewController() {
+//     // initState();
+//   }
+
+//   // List<Pokemon> _pokemons = [];
+//   // List<Pokemon> get pokemons => _pokemons;
+
+//   // bool _isLoadMoreLoading = false;
+//   // bool get isLoadMoreLoading => _isLoadMoreLoading;
+
+//   // int _offset = 1;
+//   // int _limit = 10;
+
+//   // void initState() async {
+//   //   _pokemons = [];
+//   //   await _loadPokemonsFromApi();
+//   // }
+
+//   // loadMorePokemons() async {
+//   //   _offset += _limit;
+//   //   await _loadPokemonsFromApi();
+//   // }
+
+//   // _loadPokemonsFromApi() async {
+//   //   _isLoadMoreLoading = true;
+
+//   //   List<Pokemon> _pokemonBuffer = await _pokeApiRepository.getPokemonsList(
+//   //       offset: _offset, limit: _offset + _limit);
+//   //   _pokemons += _pokemonBuffer;
+
+//   //   _isLoadMoreLoading = false;
+//   // }
+// }
+
+class HomeScreenViewState {
+  final List<Pokemon> pokemons;
+
+  final bool isLoadMoreLoading;
+
+  HomeScreenViewState(
+      {required this.pokemons, required this.isLoadMoreLoading});
+
+  HomeScreenViewState copyWith({
+    required bool isLoadMoreLoading,
+    required List<Pokemon> pokemons,
+  }) {
+    return HomeScreenViewState(
+        pokemons: pokemons, isLoadMoreLoading: isLoadMoreLoading);
   }
 }
