@@ -15,7 +15,7 @@ class PokemonSpecies {
     this.captureRate,
     this.color,
     this.eggGroups,
-    this.evolutionChain,
+    required this.evolutionChain,
     this.evolvesFromSpecies,
     this.flavorTextEntries,
     this.formDescriptions,
@@ -44,7 +44,7 @@ class PokemonSpecies {
   final int? captureRate;
   final Color? color;
   final List<Color>? eggGroups;
-  final EvolutionChain? evolutionChain;
+  final EvolutionChain evolutionChain;
   final dynamic evolvesFromSpecies;
   final List<FlavorTextEntry>? flavorTextEntries;
   final List<dynamic>? formDescriptions;
@@ -73,7 +73,7 @@ class PokemonSpecies {
         // captureRate: json["capture_rate"],
         // color: Color.fromJson(json["color"]),
         // eggGroups: List<Color>.from(json["egg_groups"].map((x) => Color.fromJson(x))),
-        // evolutionChain: EvolutionChain.fromJson(json["evolution_chain"]),
+        evolutionChain: EvolutionChain.fromJson(json["evolution_chain"]),
         // evolvesFromSpecies: json["evolves_from_species"],
         flavorTextEntries: List<FlavorTextEntry>.from(
             json["flavor_text_entries"]

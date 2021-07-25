@@ -11,6 +11,10 @@ abstract class PokeApiRepository {
   Future<List<Pokemon>> getPokemonsList(
       {required int offset, required int limit});
   Future<PokemonSpecies> getPokemonSpecies({required int id});
+
+  Future<List<Pokemon>> getPokemonEvolutionChain({
+    required int id,
+  });
 }
 
 class PokeApiRepositoryImpl implements PokeApiRepository {
@@ -78,5 +82,54 @@ class PokeApiRepositoryImpl implements PokeApiRepository {
     }
 
     return _pokemonSpecies;
+  }
+
+  Future<List<Pokemon>> getPokemonEvolutionChain({
+    required int id,
+  }) async {
+    List<Pokemon> _pokemonEvolutions = [];
+    try {
+      Response response = await _dio.get(getPokemonEvolutionChainUrl + '/$id');
+
+      // getting and  adding the base pokemon.
+
+      //get the 'id' from the URL.
+      String _baseId = response.data['chain']['species']['url'];
+      _baseId = _baseId.replaceFirst(
+          "https://pokeapi.co/api/v2/pokemon-species/", '');
+      _baseId = _baseId.replaceAll('/', '');
+
+      try {
+        Response response2 = await _dio.get(getPokemonsUrl + '/$_baseId');
+        _pokemonEvolutions.add(Pokemon.fromJson(response2.data));
+      } catch (e) {
+        print(' error while getting : ${getPokemonsUrl + '/$_baseId'} : $e');
+      }
+
+      //Get the rest of evolution chain.
+
+      List evolvesTo = response.data['chain']['evolves_to'];
+
+      while (evolvesTo.length > 0) {
+        String _id = evolvesTo[0]['species']['url'];
+        _id =
+            _id.replaceFirst("https://pokeapi.co/api/v2/pokemon-species/", '');
+        _id = _id.replaceAll('/', '');
+
+        try {
+          Response response2 = await _dio.get(getPokemonsUrl + '/$_id');
+          _pokemonEvolutions.add(Pokemon.fromJson(response2.data));
+          evolvesTo = evolvesTo[0]['evolves_to'];
+        } catch (e) {
+          print(' error while getting : ${getPokemonsUrl + '/$_id'} : $e');
+        }
+      }
+
+      return _pokemonEvolutions;
+    } catch (e) {
+      print(
+          ' error while getting : ${getPokemonEvolutionChainUrl + '/$id'} : $e');
+      return [];
+    }
   }
 }
