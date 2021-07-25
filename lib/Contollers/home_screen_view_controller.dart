@@ -23,53 +23,15 @@ class HomeScreenViewNotifier extends StateNotifier<HomeScreenViewState> {
   }
 
   _loadPokemonsFromApi() async {
-    
-    state = state.copyWith(pokemons: state.pokemons, isLoadMoreLoading: true);
-   
+    state = state.copyWith(isLoadMoreLoading: true);
     List<Pokemon> _pokemonBuffer = await pokeApiRepository.getPokemonsList(
         offset: _offset, limit: _offset + _limit);
-    
+
     state = state.copyWith(
         pokemons: state.pokemons + _pokemonBuffer, isLoadMoreLoading: false);
-    
   }
 }
 
-// class HomeScreenViewController {
-//   // final PokeApiRepository _pokeApiRepository;
-//   HomeScreenViewController() {
-//     // initState();
-//   }
-
-//   // List<Pokemon> _pokemons = [];
-//   // List<Pokemon> get pokemons => _pokemons;
-
-//   // bool _isLoadMoreLoading = false;
-//   // bool get isLoadMoreLoading => _isLoadMoreLoading;
-
-//   // int _offset = 1;
-//   // int _limit = 10;
-
-//   // void initState() async {
-//   //   _pokemons = [];
-//   //   await _loadPokemonsFromApi();
-//   // }
-
-//   // loadMorePokemons() async {
-//   //   _offset += _limit;
-//   //   await _loadPokemonsFromApi();
-//   // }
-
-//   // _loadPokemonsFromApi() async {
-//   //   _isLoadMoreLoading = true;
-
-//   //   List<Pokemon> _pokemonBuffer = await _pokeApiRepository.getPokemonsList(
-//   //       offset: _offset, limit: _offset + _limit);
-//   //   _pokemons += _pokemonBuffer;
-
-//   //   _isLoadMoreLoading = false;
-//   // }
-// }
 
 class HomeScreenViewState {
   final List<Pokemon> pokemons;
@@ -80,10 +42,11 @@ class HomeScreenViewState {
       {required this.pokemons, required this.isLoadMoreLoading});
 
   HomeScreenViewState copyWith({
-    required bool isLoadMoreLoading,
-    required List<Pokemon> pokemons,
+    bool? isLoadMoreLoading,
+    List<Pokemon>? pokemons,
   }) {
     return HomeScreenViewState(
-        pokemons: pokemons, isLoadMoreLoading: isLoadMoreLoading);
+        pokemons: pokemons ?? this.pokemons,
+        isLoadMoreLoading: isLoadMoreLoading ?? this.isLoadMoreLoading);
   }
 }

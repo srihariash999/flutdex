@@ -6,13 +6,13 @@ Pokemon pokemonFromJson(String str) => Pokemon.fromJson(json.decode(str));
 
 class Pokemon {
   Pokemon({
-    this.abilities,
+   required this.abilities,
     this.baseExperience,
     this.forms,
     this.gameIndices,
-    this.height,
+    required this.height,
     this.heldItems,
-    this.id,
+    required this.id,
     this.isDefault,
     this.locationAreaEncounters,
     this.moves,
@@ -23,16 +23,16 @@ class Pokemon {
     this.sprites,
     this.stats,
     this.types,
-    this.weight,
+    required this.weight,
   });
 
-  List<Ability>? abilities;
+  List<Ability> abilities;
   int? baseExperience;
   List<Species>? forms;
   List<GameIndex>? gameIndices;
-  int? height;
+  int height;
   List<HeldItem>? heldItems;
-  int? id;
+  int id;
   bool? isDefault;
   String? locationAreaEncounters;
   List<Move>? moves;
@@ -43,14 +43,14 @@ class Pokemon {
   Sprites? sprites;
   List<Stat>? stats;
   List<Type>? types;
-  int? weight;
+  int weight;
 
   factory Pokemon.fromJson(Map<String, dynamic> json) => Pokemon(
-        // abilities: List<Ability>.from(json["abilities"].map((x) => Ability.fromJson(x))),
+        abilities: List<Ability>.from(json["abilities"].map((x) => Ability.fromJson(x))),
         // baseExperience: json["base_experience"],
         // forms: List<Species>.from(json["forms"].map((x) => Species.fromJson(x))),
         // gameIndices: List<GameIndex>.from(json["game_indices"].map((x) => GameIndex.fromJson(x))),
-        // height: json["height"],
+        height: json["height"],
         // heldItems: List<HeldItem>.from(json["held_items"].map((x) => HeldItem.fromJson(x))),
         id: json["id"],
         isDefault: json["is_default"],
@@ -63,7 +63,7 @@ class Pokemon {
         sprites: Sprites.fromJson(json["sprites"]),
         // stats: List<Stat>.from(json["stats"].map((x) => Stat.fromJson(x))),
         types: List<Type>.from(json["types"].map((x) => Type.fromJson(x))),
-        // weight: json["weight"],
+        weight: json["weight"],
       );
 
   // Map<String, dynamic> toJson() => {
